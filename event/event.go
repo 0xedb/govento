@@ -12,7 +12,8 @@ const (
 	// PhaseTarget has event arrived at the event's target.
 	PhaseTarget
 
-	// PhaseBubbling has event propagating back up through the target's ancestors in reverse order, starting with the parent
+	// PhaseBubbling has event propagating back up through the target's ancestors
+	// in reverse order, starting with the parent
 	PhaseBubbling
 )
 
@@ -34,6 +35,7 @@ type InitOptions struct {
 // Event represents an event
 type Event struct {
 	InitOptions
+
 	CancelBubble     bool
 	CurrentTarget    EventTarget
 	DefaultPrevented bool
@@ -48,6 +50,7 @@ type Event struct {
 // Init creates a new Event
 func (event Event) Init(eventType string, options InitOptions) Event {
 	evt := Event{}
+	evt.Type = eventType
 	evt.Bubbles = options.Bubbles
 	evt.Cancelable = options.Cancelable
 	evt.Composed = options.Composed
