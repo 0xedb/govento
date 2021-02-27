@@ -37,18 +37,18 @@ type Event struct {
 	InitOptions
 
 	CancelBubble     bool
-	CurrentTarget    EventTarget
+	CurrentTarget    Target
 	DefaultPrevented bool
 	EventPhase       uint8
 	ReturnValue      bool
-	Target           EventTarget
+	Target           Target
 	TimeStamp        time.Time
 	Type             string
 	IsTrusted        bool
 }
 
-// Init creates a new Event
-func (event Event) Init(eventType string, options InitOptions) Event {
+// NewEvent creates a new Event
+func NewEvent(eventType string, options InitOptions) Event {
 	evt := Event{}
 	evt.Type = eventType
 	evt.Bubbles = options.Bubbles
@@ -60,8 +60,8 @@ func (event Event) Init(eventType string, options InitOptions) Event {
 
 // ComposedPath returns the event’s path which is an array
 // of the objects on which listeners will be invoked
-func (event Event) ComposedPath() []EventTarget {
-	return []EventTarget{}
+func (event Event) ComposedPath() []Target {
+	return []Target{}
 }
 
 // PreventDefault  tells the user agent that if the event does not get explicitly
