@@ -40,7 +40,7 @@ type Event struct {
 	CurrentTarget    Target
 	DefaultPrevented bool
 	EventPhase       uint8
-	ReturnValue      bool
+	ReturnValue      bool	// legacy
 	Target           Target
 	TimeStamp        time.Time
 	Type             string
@@ -48,7 +48,7 @@ type Event struct {
 }
 
 // NewEvent creates a new Event
-func NewEvent(eventType string, options InitOptions) Event {
+func NewEvent(eventType string, options *InitOptions) Event {
 	evt := Event{}
 	evt.Type = eventType
 	evt.Bubbles = options.Bubbles

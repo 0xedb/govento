@@ -1,19 +1,20 @@
 package event
 
 import (
-	"fmt"
 	"reflect"
+
+	"github.com/emirpasic/gods/sets/hashset"
 )
 
 // Listener is an event callback function
-type Listener func(Event)
+type Listener *func(Event)
 
 // listenermap is a map with listener as key and
 // a map of listerneroptions as value
-type listenermap map[*Listener]map[ListernerOptions]ListernerOptions
+type listenermap map[Listener]*hashset.Set
 
 // eventlisteners is a map of event and their listeners
-var eventlisteners map[string]listenermap
+var eventlisteners = make(map[string]listenermap)
 
 // CaptureOptions sets the options for Capture & UseCapture
 type CaptureOptions struct {
@@ -73,26 +74,38 @@ func NewEventTarget() Target {
 
 // AddEventListener registers an event handler of a
 // specific event type on the EventTarget
-func (target Target) AddEventListener(event string, listener Listener, options ListernerOptions) {
-
+func (target Target) AddEventListener(event string, listener Listener, options *ListernerOptions) {
 
 	if event == "" || listener == nil {
 		return
 	}
 
-	// check if event already exists for the listener
+	// check if event already exists
 	present, ok := eventlisteners[event]
 
-	callback := present[&listener]
+	if ok {
+		if present[listener].Contains(options) {
+			return
+		}
 
-	if ok && CompareListenerOptions(options, callback[options]) {
+		// different options
+		present[listener].Add(options)
 		return
 	}
 
-	 v := callback[options] 
-	 fmt.Println(v, "v")
-	// present[&listener] 
-	// eventlisteners[event] = []interface{}{listener, options}
+	set := hashset.New()
+	set.Add(options)
+
+	if !ok {
+		// no such event
+		mp := make(listenermap)
+		mp[listener] = set
+		eventlisteners[event] = mp
+		return
+	}
+
+	present[listener] = set
+
 }
 
 // RemoveEventListener removes an event listener from the EventTarget
@@ -110,13 +123,20 @@ func (target Target) DispatchEvent(event Event) (bool, error) {
 	// handlers which received event called Event.preventDefault(). Otherwise it returns true.
 
 	// get listeners and call them all with the event
+	// listeners := eventlisteners[event.Type]
+	// fmt.Println(listeners)
+	// for key := range listeners {
+	// 	fmt.Println(*key)
+	// 	(*key)(event)
+	// }
+
 	listeners := eventlisteners[event.Type]
-	fmt.Println(listeners)
+	// fmt.Println(listeners)
+
 	for key := range listeners {
-		fmt.Println(*key)
+		// fmt.Println(*key())
 		(*key)(event)
 	}
-	fmt.Println("herezz")
 
 	return true, nil
 }

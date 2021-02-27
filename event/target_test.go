@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func hello(evt Event) {
+var hello = func (evt Event) {
 	fmt.Println("hello", evt.Type)
 }
 
@@ -15,9 +15,9 @@ func TestTarget(t *testing.T) {
 	target := NewEventTarget()
 
 	if !reflect.DeepEqual(target, Target{}) {
-		t.FailNow()
+		t.Fatal()
 	}
 
-	target.AddEventListener("click", hello, ListernerOptions{})
-	target.DispatchEvent(NewEvent("click", InitOptions{}))
+	target.AddEventListener("click", &hello, &ListernerOptions{})
+	target.DispatchEvent(NewEvent("click", &InitOptions{}))
 }
